@@ -1,0 +1,8 @@
+{
+  "name": "Cauvery Polytechnic, Gonikoppal",
+  "description": "A full-stack, dynamic CMS-driven college website with WordPress-style Admin Dashboard, cinematic hero slider, admissions, and departmental modules.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
