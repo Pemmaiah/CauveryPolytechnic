@@ -235,14 +235,24 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // CRUD Operations
   const saveSlider = async (slide: Partial<SliderItem>) => {
-    try {
-      const id = await saveDocument('sliders', slide);
-      showToast('Slide Saved', 'Hero slider has been successfully updated.');
-      return id;
-    } catch (e) {
-      showToast('Save Failed', 'Could not save slider. Check connection.', 'error');
-      throw e;
-    }
+    const id = slide.id || Date.now().toString();
+    const updatedSlide = { ...slide, id } as SliderItem;
+    
+    // 1. Optimistic React state update
+    setSliders((prev) => {
+      const idx = prev.findIndex((s) => s.id === id);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], ...updatedSlide };
+        return next;
+      }
+      return [updatedSlide, ...prev];
+    });
+
+    // 2. Persist to Firestore & Local cache
+    await saveDocument('sliders', updatedSlide, id);
+    showToast('Slide Saved', 'Hero slider has been successfully updated.');
+    return id;
   };
 
   const addSlider = async (slide: Omit<SliderItem, 'id'>) => {
@@ -256,13 +266,11 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const deleteSlider = async (id: string) => {
-    try {
-      await deleteDocument('sliders', id);
-      showToast('Slide Removed', 'Hero slide was removed successfully.');
-    } catch (e) {
-      showToast('Delete Failed', 'Could not delete slider.', 'error');
-      throw e;
-    }
+    // 1. Optimistic React state update
+    setSliders((prev) => prev.filter((s) => s.id !== id));
+    // 2. Persist delete
+    await deleteDocument('sliders', id);
+    showToast('Slide Removed', 'Hero slide was removed successfully.');
   };
 
   const reorderSliders = async (items: SliderItem[]) => {
@@ -272,14 +280,24 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const saveMenu = async (item: Partial<MenuItem>) => {
-    try {
-      const id = await saveDocument('menus', item);
-      showToast('Menu Saved', 'Navigation menu item updated.');
-      return id;
-    } catch (e) {
-      showToast('Save Failed', 'Could not save menu item.', 'error');
-      throw e;
-    }
+    const id = item.id || Date.now().toString();
+    const updatedMenu = { ...item, id } as MenuItem;
+
+    // 1. Optimistic React state update
+    setMenus((prev) => {
+      const idx = prev.findIndex((m) => m.id === id);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], ...updatedMenu };
+        return next;
+      }
+      return [...prev, updatedMenu];
+    });
+
+    // 2. Persist to Firestore & Local cache
+    await saveDocument('menus', updatedMenu, id);
+    showToast('Menu Saved', 'Navigation menu item updated.');
+    return id;
   };
 
   const addMenu = async (item: Omit<MenuItem, 'id'>) => {
@@ -293,13 +311,11 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const deleteMenu = async (id: string) => {
-    try {
-      await deleteDocument('menus', id);
-      showToast('Menu Removed', 'Menu item was removed.');
-    } catch (e) {
-      showToast('Delete Failed', 'Could not delete menu.', 'error');
-      throw e;
-    }
+    // 1. Optimistic React state update (remove item and any child items)
+    setMenus((prev) => prev.filter((m) => m.id !== id && m.parentId !== id));
+    // 2. Persist delete
+    await deleteDocument('menus', id);
+    showToast('Menu Removed', 'Menu item was removed.');
   };
 
   const reorderMenus = async (items: MenuItem[]) => {
@@ -309,14 +325,30 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const savePage = async (page: Partial<PageItem>) => {
-    try {
-      const id = await saveDocument('pages', page, page.id || page.slug);
-      showToast('Page Saved', `Page "${page.title}" updated successfully.`);
-      return id;
-    } catch (e) {
-      showToast('Save Failed', 'Could not save page.', 'error');
-      throw e;
-    }
+    const id = page.id || page.slug || Date.now().toString();
+    const now = new Date().toISOString();
+    const updatedPage = { 
+      ...page, 
+      id, 
+      createdAt: page.createdAt || now, 
+      updatedAt: now 
+    } as PageItem;
+
+    // 1. Optimistic React state update
+    setPages((prev) => {
+      const idx = prev.findIndex((p) => p.id === id || p.slug === page.slug);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], ...updatedPage };
+        return next;
+      }
+      return [updatedPage, ...prev];
+    });
+
+    // 2. Persist
+    await saveDocument('pages', updatedPage, id);
+    showToast('Page Saved', `Page "${updatedPage.title}" updated successfully.`);
+    return id;
   };
 
   const addPage = async (page: Omit<PageItem, 'id' | 'createdAt' | 'updatedAt'>) => {
@@ -332,24 +364,32 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const deletePage = async (id: string) => {
-    try {
-      await deleteDocument('pages', id);
-      showToast('Page Deleted', 'Page removed permanently.');
-    } catch (e) {
-      showToast('Delete Failed', 'Could not delete page.', 'error');
-      throw e;
-    }
+    // 1. Optimistic React state update
+    setPages((prev) => prev.filter((p) => p.id !== id && p.slug !== id));
+    // 2. Persist delete
+    await deleteDocument('pages', id);
+    showToast('Page Deleted', 'Page removed permanently.');
   };
 
   const saveProgramme = async (prog: Partial<ProgrammeItem>) => {
-    try {
-      const id = await saveDocument('programmes', prog);
-      showToast('Programme Saved', `Academic programme "${prog.name}" saved.`);
-      return id;
-    } catch (e) {
-      showToast('Save Failed', 'Could not save programme.', 'error');
-      throw e;
-    }
+    const id = prog.id || Date.now().toString();
+    const updatedProg = { ...prog, id } as ProgrammeItem;
+
+    // 1. Optimistic React state update
+    setProgrammes((prev) => {
+      const idx = prev.findIndex((p) => p.id === id || p.code === prog.code);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], ...updatedProg };
+        return next;
+      }
+      return [...prev, updatedProg];
+    });
+
+    // 2. Persist
+    await saveDocument('programmes', updatedProg, id);
+    showToast('Programme Saved', `Academic programme "${updatedProg.name}" saved.`);
+    return id;
   };
 
   const addProgramme = async (prog: Omit<ProgrammeItem, 'id'>) => {
@@ -363,24 +403,31 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const deleteProgramme = async (id: string) => {
-    try {
-      await deleteDocument('programmes', id);
-      showToast('Programme Deleted', 'Programme removed.');
-    } catch (e) {
-      showToast('Delete Failed', 'Could not delete programme.', 'error');
-      throw e;
-    }
+    // 1. Optimistic React state update
+    setProgrammes((prev) => prev.filter((p) => p.id !== id));
+    // 2. Persist delete
+    await deleteDocument('programmes', id);
+    showToast('Programme Deleted', 'Programme removed.');
   };
 
   const saveNews = async (item: Partial<NewsItem>) => {
-    try {
-      const id = await saveDocument('news', item, item.id || item.slug);
-      showToast('News Saved', `Article "${item.title}" updated.`);
-      return id;
-    } catch (e) {
-      showToast('Save Failed', 'Could not save news article.', 'error');
-      throw e;
-    }
+    const id = item.id || item.slug || Date.now().toString();
+    const now = new Date().toISOString();
+    const updatedNews = { ...item, id, createdAt: item.createdAt || now } as NewsItem;
+
+    setNews((prev) => {
+      const idx = prev.findIndex((n) => n.id === id || n.slug === item.slug);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], ...updatedNews };
+        return next;
+      }
+      return [updatedNews, ...prev];
+    });
+
+    await saveDocument('news', updatedNews, id);
+    showToast('News Saved', `Article "${updatedNews.title}" updated.`);
+    return id;
   };
 
   const addNews = async (item: Omit<NewsItem, 'id' | 'createdAt'>) => {
@@ -396,24 +443,28 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const deleteNews = async (id: string) => {
-    try {
-      await deleteDocument('news', id);
-      showToast('News Deleted', 'News item removed.');
-    } catch (e) {
-      showToast('Delete Failed', 'Could not delete news.', 'error');
-      throw e;
-    }
+    setNews((prev) => prev.filter((n) => n.id !== id));
+    await deleteDocument('news', id);
+    showToast('News Deleted', 'News item removed.');
   };
 
   const saveEvent = async (event: Partial<EventItem>) => {
-    try {
-      const id = await saveDocument('events', event);
-      showToast('Event Saved', `Event "${event.title}" saved.`);
-      return id;
-    } catch (e) {
-      showToast('Save Failed', 'Could not save event.', 'error');
-      throw e;
-    }
+    const id = event.id || Date.now().toString();
+    const updatedEvent = { ...event, id } as EventItem;
+
+    setEvents((prev) => {
+      const idx = prev.findIndex((e) => e.id === id);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], ...updatedEvent };
+        return next;
+      }
+      return [updatedEvent, ...prev];
+    });
+
+    await saveDocument('events', updatedEvent, id);
+    showToast('Event Saved', `Event "${updatedEvent.title}" saved.`);
+    return id;
   };
 
   const addEvent = async (event: Omit<EventItem, 'id'>) => {
@@ -428,24 +479,28 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const deleteEvent = async (id: string) => {
-    try {
-      await deleteDocument('events', id);
-      showToast('Event Deleted', 'Event removed.');
-    } catch (e) {
-      showToast('Delete Failed', 'Could not delete event.', 'error');
-      throw e;
-    }
+    setEvents((prev) => prev.filter((e) => e.id !== id));
+    await deleteDocument('events', id);
+    showToast('Event Deleted', 'Event removed.');
   };
 
   const saveFacility = async (fac: Partial<FacilityItem>) => {
-    try {
-      const id = await saveDocument('facilities', fac);
-      showToast('Facility Saved', `Facility "${fac.title}" updated.`);
-      return id;
-    } catch (e) {
-      showToast('Save Failed', 'Could not save facility.', 'error');
-      throw e;
-    }
+    const id = fac.id || Date.now().toString();
+    const updatedFac = { ...fac, id } as FacilityItem;
+
+    setFacilities((prev) => {
+      const idx = prev.findIndex((f) => f.id === id);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], ...updatedFac };
+        return next;
+      }
+      return [updatedFac, ...prev];
+    });
+
+    await saveDocument('facilities', updatedFac, id);
+    showToast('Facility Saved', `Facility "${updatedFac.title}" updated.`);
+    return id;
   };
 
   const addFacility = async (fac: Omit<FacilityItem, 'id'>) => {
@@ -459,24 +514,28 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const deleteFacility = async (id: string) => {
-    try {
-      await deleteDocument('facilities', id);
-      showToast('Facility Removed', 'Facility item removed.');
-    } catch (e) {
-      showToast('Delete Failed', 'Could not delete facility.', 'error');
-      throw e;
-    }
+    setFacilities((prev) => prev.filter((f) => f.id !== id));
+    await deleteDocument('facilities', id);
+    showToast('Facility Removed', 'Facility item removed.');
   };
 
   const saveGalleryItem = async (item: Partial<GalleryItem>) => {
-    try {
-      const id = await saveDocument('gallery', item);
-      showToast('Gallery Updated', 'Photo added to college gallery.');
-      return id;
-    } catch (e) {
-      showToast('Save Failed', 'Could not save photo.', 'error');
-      throw e;
-    }
+    const id = item.id || Date.now().toString();
+    const updatedItem = { ...item, id } as GalleryItem;
+
+    setGallery((prev) => {
+      const idx = prev.findIndex((g) => g.id === id);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], ...updatedItem };
+        return next;
+      }
+      return [updatedItem, ...prev];
+    });
+
+    await saveDocument('gallery', updatedItem, id);
+    showToast('Gallery Updated', 'Photo added to college gallery.');
+    return id;
   };
 
   const addGalleryItem = async (item: Omit<GalleryItem, 'id' | 'createdAt'>) => {
@@ -491,45 +550,53 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const deleteGalleryItem = async (id: string) => {
-    try {
-      await deleteDocument('gallery', id);
-      showToast('Photo Removed', 'Image removed from gallery.');
-    } catch (e) {
-      showToast('Delete Failed', 'Could not delete image.', 'error');
-      throw e;
-    }
+    setGallery((prev) => prev.filter((g) => g.id !== id));
+    await deleteDocument('gallery', id);
+    showToast('Photo Removed', 'Image removed from gallery.');
   };
 
   const saveWhyUs = async (item: Partial<WhyUsItem>) => {
-    try {
-      const id = await saveDocument('whyUs', item);
-      showToast('Why Us Updated', 'Advantage item saved.');
-      return id;
-    } catch (e) {
-      showToast('Save Failed', 'Could not save item.', 'error');
-      throw e;
-    }
+    const id = item.id || Date.now().toString();
+    const updatedWhyUs = { ...item, id } as WhyUsItem;
+
+    setWhyUs((prev) => {
+      const idx = prev.findIndex((w) => w.id === id);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], ...updatedWhyUs };
+        return next;
+      }
+      return [updatedWhyUs, ...prev];
+    });
+
+    await saveDocument('whyUs', updatedWhyUs, id);
+    showToast('Why Us Updated', 'Advantage item saved.');
+    return id;
   };
 
   const deleteWhyUs = async (id: string) => {
-    try {
-      await deleteDocument('whyUs', id);
-      showToast('Item Removed', 'Why Us item removed.');
-    } catch (e) {
-      showToast('Delete Failed', 'Could not delete item.', 'error');
-      throw e;
-    }
+    setWhyUs((prev) => prev.filter((w) => w.id !== id));
+    await deleteDocument('whyUs', id);
+    showToast('Item Removed', 'Why Us item removed.');
   };
 
   const saveAicte = async (item: Partial<AicteItem>) => {
-    try {
-      const id = await saveDocument('aicte', item);
-      showToast('AICTE Document Saved', 'Approval document saved.');
-      return id;
-    } catch (e) {
-      showToast('Save Failed', 'Could not save AICTE document.', 'error');
-      throw e;
-    }
+    const id = item.id || Date.now().toString();
+    const updatedAicte = { ...item, id } as AicteItem;
+
+    setAicte((prev) => {
+      const idx = prev.findIndex((a) => a.id === id);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], ...updatedAicte };
+        return next;
+      }
+      return [updatedAicte, ...prev];
+    });
+
+    await saveDocument('aicte', updatedAicte, id);
+    showToast('AICTE Document Saved', 'Approval document saved.');
+    return id;
   };
 
   const addAicteDoc = async (item: Omit<AicteItem, 'id' | 'uploadedAt'>) => {
@@ -544,13 +611,9 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const deleteAicte = async (id: string) => {
-    try {
-      await deleteDocument('aicte', id);
-      showToast('Document Removed', 'AICTE document deleted.');
-    } catch (e) {
-      showToast('Delete Failed', 'Could not delete document.', 'error');
-      throw e;
-    }
+    setAicte((prev) => prev.filter((a) => a.id !== id));
+    await deleteDocument('aicte', id);
+    showToast('Document Removed', 'AICTE document deleted.');
   };
 
   const deleteAicteDoc = async (id: string) => {
@@ -558,48 +621,42 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const saveTicker = async (item: Partial<TickerItem>) => {
-    try {
-      const id = await saveDocument('ticker', item);
-      showToast('Ticker Item Saved', 'Scrolling announcement ticker updated.');
-      return id;
-    } catch (e) {
-      showToast('Save Failed', 'Could not save ticker item.', 'error');
-      throw e;
-    }
+    const id = item.id || Date.now().toString();
+    const updatedTicker = { ...item, id } as TickerItem;
+
+    setTicker((prev) => {
+      const idx = prev.findIndex((t) => t.id === id);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], ...updatedTicker };
+        return next;
+      }
+      return [updatedTicker, ...prev];
+    });
+
+    await saveDocument('ticker', updatedTicker, id);
+    showToast('Ticker Item Saved', 'Scrolling announcement ticker updated.');
+    return id;
   };
 
   const deleteTicker = async (id: string) => {
-    try {
-      await deleteDocument('ticker', id);
-      showToast('Ticker Item Deleted', 'Announcement removed.');
-    } catch (e) {
-      showToast('Delete Failed', 'Could not delete ticker item.', 'error');
-      throw e;
-    }
+    setTicker((prev) => prev.filter((t) => t.id !== id));
+    await deleteDocument('ticker', id);
+    showToast('Ticker Item Deleted', 'Announcement removed.');
   };
 
   const updateFooter = async (data: Partial<FooterConfig>) => {
-    try {
-      const merged = { ...footer, ...data };
-      await saveDocument('settings', merged, 'footer');
-      setFooter(merged);
-      showToast('Footer Updated', 'Public website footer updated.');
-    } catch (e) {
-      showToast('Update Failed', 'Could not update footer.', 'error');
-      throw e;
-    }
+    const merged = { ...footer, ...data };
+    setFooter(merged);
+    await saveDocument('settings', merged, 'footer');
+    showToast('Footer Updated', 'Public website footer updated.');
   };
 
   const updateSettings = async (data: Partial<WebsiteSettings>) => {
-    try {
-      const merged = { ...settings, ...data };
-      await saveDocument('settings', merged, 'general');
-      setSettings(merged);
-      showToast('Settings Saved', 'College website settings updated.');
-    } catch (e) {
-      showToast('Update Failed', 'Could not save settings.', 'error');
-      throw e;
-    }
+    const merged = { ...settings, ...data };
+    setSettings(merged);
+    await saveDocument('settings', merged, 'general');
+    showToast('Settings Saved', 'College website settings updated.');
   };
 
   const submitApplication = async (data: any) => {

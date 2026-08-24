@@ -1,0 +1,82 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global rule: allow public read for college information, allow write for admin/CMS and form submissions
+    match /sliders/{sliderId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    match /menus/{menuId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    match /pages/{pageId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    match /programmes/{programmeId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    match /news/{newsId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    match /facilities/{facilityId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    match /gallery/{galleryId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    match /whyUs/{whyUsId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    match /aicte/{aicteId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    match /ticker/{tickerId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    match /admissions/{admissionId} {
+      allow read, write: if true;
+    }
+    
+    match /contact/{contactId} {
+      allow read, write: if true;
+    }
+    
+    match /admins/{adminId} {
+      allow read, write: if true;
+    }
+    
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

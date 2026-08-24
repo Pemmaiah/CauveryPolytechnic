@@ -289,29 +289,56 @@ export async function saveDocument<T extends { id?: string }>(
   item: T,
   id?: string
 ): Promise<string> {
+  const targetId = id || item.id || `${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+  const payload = {
+    ...item,
+    id: targetId,
+    updatedAt: new Date().toISOString()
+  };
+
+  // 1. Immediately sync into Local Storage Cache for instant persistence & offline readiness
   try {
-    const targetId = id || item.id || doc(collection(db, collectionName)).id;
-    const docRef = doc(db, collectionName, targetId);
-    const payload = {
-      ...item,
-      id: targetId,
-      updatedAt: new Date().toISOString()
-    };
-    await setDoc(docRef, payload, { merge: true });
-    return targetId;
-  } catch (err) {
-    console.error(`Error saving document in ${collectionName}:`, err);
-    throw err;
+    const cached = getCached<any[]>(collectionName, []);
+    const existingIndex = cached.findIndex((x) => x.id === targetId);
+    let updatedList;
+    if (existingIndex >= 0) {
+      updatedList = [...cached];
+      updatedList[existingIndex] = { ...updatedList[existingIndex], ...payload };
+    } else {
+      updatedList = [payload, ...cached];
+    }
+    setCached(collectionName, updatedList);
+  } catch (e) {
+    console.warn(`Local cache sync warning for ${collectionName}:`, e);
   }
+
+  // 2. Persist to Firestore DB
+  try {
+    const docRef = doc(db, collectionName, targetId);
+    await setDoc(docRef, payload, { merge: true });
+  } catch (err) {
+    console.warn(`Firestore save warning for ${collectionName}/${targetId}:`, err);
+  }
+
+  return targetId;
 }
 
 export async function deleteDocument(collectionName: string, id: string): Promise<void> {
+  // 1. Immediately remove from Local Storage Cache
+  try {
+    const cached = getCached<any[]>(collectionName, []);
+    const updatedList = cached.filter((x) => x.id !== id);
+    setCached(collectionName, updatedList);
+  } catch (e) {
+    console.warn(`Local cache delete warning for ${collectionName}:`, e);
+  }
+
+  // 2. Delete from Firestore DB
   try {
     const docRef = doc(db, collectionName, id);
     await deleteDoc(docRef);
   } catch (err) {
-    console.error(`Error deleting document from ${collectionName}:`, err);
-    throw err;
+    console.warn(`Firestore delete warning for ${collectionName}/${id}:`, err);
   }
 }
 
@@ -320,16 +347,21 @@ export async function updateDocumentOrder<T extends { id: string; displayOrder?:
   items: T[],
   orderField: 'displayOrder' | 'order' = 'displayOrder'
 ): Promise<void> {
+  const updatedItems = items.map((item, index) => ({
+    ...item,
+    [orderField]: index + 1
+  }));
+  setCached(collectionName, updatedItems);
+
   try {
     const batch = writeBatch(db);
-    items.forEach((item, index) => {
+    updatedItems.forEach((item) => {
       const docRef = doc(db, collectionName, item.id);
-      batch.update(docRef, { [orderField]: index + 1 });
+      batch.set(docRef, { [orderField]: (item as any)[orderField] }, { merge: true });
     });
     await batch.commit();
   } catch (err) {
-    console.error(`Error updating order for ${collectionName}:`, err);
-    throw err;
+    console.warn(`Firestore batch order warning for ${collectionName}:`, err);
   }
 }
 

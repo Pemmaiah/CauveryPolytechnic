@@ -1,0 +1,146 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "entities": {
+    "SliderItem": {
+      "title": "SliderItem",
+      "description": "Cinematic hero slider banner with animations and links",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "description": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "mediaType": { "type": "string" },
+        "buttonText": { "type": "string" },
+        "buttonUrl": { "type": "string" },
+        "secondaryButtonText": { "type": "string" },
+        "secondaryButtonUrl": { "type": "string" },
+        "animationType": { "type": "string" },
+        "animationDuration": { "type": "number" },
+        "slideDuration": { "type": "number" },
+        "overlayOpacity": { "type": "number" },
+        "textPosition": { "type": "string" },
+        "displayOrder": { "type": "number" },
+        "active": { "type": "boolean" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "title", "imageUrl", "displayOrder", "active"]
+    },
+    "MenuItem": {
+      "title": "MenuItem",
+      "description": "Hierarchical navigation tree menu item",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "url": { "type": "string" },
+        "parentId": { "type": "string" },
+        "order": { "type": "number" },
+        "active": { "type": "boolean" },
+        "isExternal": { "type": "boolean" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "title", "url", "order", "active"]
+    },
+    "PageItem": {
+      "title": "PageItem",
+      "description": "Institutional web page with rich HTML content",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "slug": { "type": "string" },
+        "content": { "type": "string" },
+        "featuredImage": { "type": "string" },
+        "layout": { "type": "string" },
+        "status": { "type": "string" },
+        "metaDescription": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "title", "slug", "content", "status"]
+    },
+    "ProgrammeItem": {
+      "title": "ProgrammeItem",
+      "description": "Diploma engineering course details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "code": { "type": "string" },
+        "duration": { "type": "string" },
+        "intake": { "type": "number" },
+        "eligibility": { "type": "string" },
+        "description": { "type": "string" },
+        "image": { "type": "string" },
+        "highlights": { "type": "array", "items": { "type": "string" } },
+        "careers": { "type": "array", "items": { "type": "string" } },
+        "hodName": { "type": "string" },
+        "hodMessage": { "type": "string" },
+        "displayOrder": { "type": "number" },
+        "active": { "type": "boolean" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "name", "code", "duration", "intake", "image", "displayOrder", "active"]
+    }
+  },
+  "firestore": {
+    "/sliders/{sliderId}": {
+      "schema": "SliderItem",
+      "description": "Hero slider collection"
+    },
+    "/menus/{menuId}": {
+      "schema": "MenuItem",
+      "description": "Navigation menus collection"
+    },
+    "/pages/{pageId}": {
+      "schema": "PageItem",
+      "description": "Content pages collection"
+    },
+    "/programmes/{programmeId}": {
+      "schema": "ProgrammeItem",
+      "description": "Engineering programmes collection"
+    },
+    "/news/{newsId}": {
+      "schema": "object",
+      "description": "News & announcements collection"
+    },
+    "/events/{eventId}": {
+      "schema": "object",
+      "description": "Events collection"
+    },
+    "/facilities/{facilityId}": {
+      "schema": "object",
+      "description": "Campus facilities collection"
+    },
+    "/gallery/{galleryId}": {
+      "schema": "object",
+      "description": "Gallery items collection"
+    },
+    "/whyUs/{whyUsId}": {
+      "schema": "object",
+      "description": "Why choose us collection"
+    },
+    "/aicte/{aicteId}": {
+      "schema": "object",
+      "description": "AICTE disclosure collection"
+    },
+    "/admissions/{admissionId}": {
+      "schema": "object",
+      "description": "Student admissions collection"
+    },
+    "/contact/{contactId}": {
+      "schema": "object",
+      "description": "Contact inquiries collection"
+    },
+    "/ticker/{tickerId}": {
+      "schema": "object",
+      "description": "Notice ticker collection"
+    },
+    "/settings/{settingId}": {
+      "schema": "object",
+      "description": "Website settings and configurations"
+    }
+  }
+}

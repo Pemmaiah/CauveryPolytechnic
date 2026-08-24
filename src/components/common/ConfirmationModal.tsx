@@ -6,7 +6,9 @@ interface ConfirmationModalProps {
   title: string;
   message: string;
   confirmLabel?: string;
+  confirmText?: string;
   cancelLabel?: string;
+  cancelText?: string;
   isDestructive?: boolean;
   isLoading?: boolean;
   onConfirm: () => void;
@@ -17,14 +19,18 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   isOpen,
   title,
   message,
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
+  confirmLabel,
+  confirmText,
+  cancelLabel,
+  cancelText,
   isDestructive = true,
   isLoading = false,
   onConfirm,
   onCancel
 }) => {
   if (!isOpen) return null;
+  const effectiveConfirmLabel = confirmText || confirmLabel || 'Confirm';
+  const effectiveCancelLabel = cancelText || cancelLabel || 'Cancel';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -53,7 +59,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             disabled={isLoading}
             className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
           >
-            {cancelLabel}
+            {effectiveCancelLabel}
           </button>
           <button
             type="button"
@@ -66,7 +72,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             } disabled:opacity-50 flex items-center gap-2`}
           >
             {isLoading && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
-            {confirmLabel}
+            {effectiveConfirmLabel}
           </button>
         </div>
       </div>
