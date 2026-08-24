@@ -3,6 +3,8 @@ import { useAuth } from '../../context/AuthContext';
 import { useCMS } from '../../context/CMSContext';
 import { 
   LayoutDashboard, 
+  Layers,
+  Zap,
   Sliders, 
   Menu as MenuIcon, 
   FileText, 
@@ -48,6 +50,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'ticker', label: 'Flash News & Ticker', icon: Zap },
+    { id: 'home_layout', label: 'Home Page Sections', icon: Layers },
     { id: 'sliders', label: 'Hero Sliders (Cinematic)', icon: Sliders },
     { id: 'menus', label: 'Navigation Menus', icon: MenuIcon },
     { id: 'pages', label: 'Pages & Content', icon: FileText },

@@ -58,6 +58,11 @@ service cloud.firestore {
       allow write: if true;
     }
     
+    match /homeSections/{sectionId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
     match /settings/{settingId} {
       allow read: if true;
       allow write: if true;

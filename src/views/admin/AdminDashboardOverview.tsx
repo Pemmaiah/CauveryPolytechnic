@@ -2,6 +2,8 @@ import React from 'react';
 import { useCMS } from '../../context/CMSContext';
 import { 
   Sliders, 
+  Layers,
+  Zap,
   Menu as MenuIcon, 
   FileText, 
   GraduationCap, 
@@ -35,13 +37,17 @@ export const AdminDashboardOverview: React.FC<AdminDashboardOverviewProps> = ({ 
     facilities, 
     aicte, 
     admissions, 
-    enquiries 
+    enquiries,
+    homeSections,
+    ticker
   } = useCMS();
 
   const pendingAdmissions = admissions.filter((a) => a.status === 'pending');
   const unreadEnquiries = enquiries.filter((e) => e.status === 'unread');
 
   const stats = [
+    { title: 'Flash News & Ticker', count: ticker?.length || 0, icon: Zap, tab: 'ticker', color: 'text-rose-600 bg-rose-50' },
+    { title: 'Home Page Sections', count: homeSections?.length || 0, icon: Layers, tab: 'home_layout', color: 'text-amber-700 bg-amber-50' },
     { title: 'Hero Sliders', count: sliders.length, icon: Sliders, tab: 'sliders', color: 'text-blue-600 bg-blue-50' },
     { title: 'Navigation Menus', count: menus.length, icon: MenuIcon, tab: 'menus', color: 'text-indigo-600 bg-indigo-50' },
     { title: 'CMS Pages', count: pages.length, icon: FileText, tab: 'pages', color: 'text-emerald-600 bg-emerald-50' },

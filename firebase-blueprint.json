@@ -138,6 +138,10 @@
       "schema": "object",
       "description": "Notice ticker collection"
     },
+    "/homeSections/{sectionId}": {
+      "schema": "object",
+      "description": "Customizable and reorderable home page sections collection"
+    },
     "/settings/{settingId}": {
       "schema": "object",
       "description": "Website settings and configurations"

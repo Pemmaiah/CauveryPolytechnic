@@ -30,6 +30,7 @@ import {
   ContactEnquiry, 
   TickerItem, 
   WhyUsItem, 
+  HomeSection,
   FooterConfig, 
   WebsiteSettings 
 } from '../types';
@@ -45,6 +46,7 @@ import {
   initialWhyUs, 
   initialAicte, 
   initialTicker, 
+  initialHomeSections,
   initialFooter, 
   initialSettings 
 } from './initialData';
@@ -178,6 +180,10 @@ export async function initializeFirestoreDatabase(forceSeed = false) {
       // Seed Ticker
       for (const item of initialTicker) {
         batch.set(doc(db, 'ticker', item.id), item);
+      }
+      // Seed Home Sections
+      for (const item of initialHomeSections) {
+        batch.set(doc(db, 'homeSections', item.id), item);
       }
       // Seed Footer & Settings
       batch.set(doc(db, 'settings', 'footer'), initialFooter);

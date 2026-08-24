@@ -217,6 +217,8 @@ export interface TickerItem {
   active: boolean;
   order: number;
   badge?: string;
+  isFlash?: boolean;
+  priority?: boolean;
 }
 
 export interface WhyUsItem {
@@ -226,6 +228,66 @@ export interface WhyUsItem {
   description: string;
   displayOrder: number;
   active: boolean;
+}
+
+export type HomeSectionType = 
+  | 'hero_slider' 
+  | 'principal_welcome' 
+  | 'why_us' 
+  | 'programmes' 
+  | 'admission_cta' 
+  | 'events' 
+  | 'news' 
+  | 'facilities' 
+  | 'gallery' 
+  | 'contact_map' 
+  | 'map_contact'
+  | 'custom_block'
+  | 'stats_counter'
+  | 'testimonials'
+  | 'video_showcase';
+
+export interface HomeSection {
+  id: string;
+  sectionType: HomeSectionType;
+  title: string;
+  subtitle?: string;
+  badge?: string;
+  badgeText?: string;
+  content?: string;
+  imageUrl?: string;
+  secondaryImageUrl?: string;
+  buttonText?: string;
+  buttonUrl?: string;
+  secondaryButtonText?: string;
+  secondaryButtonUrl?: string;
+  backgroundStyle?: 'white' | 'light' | 'slate' | 'dark' | 'gradient' | 'brand' | 'amber';
+  theme?: 'white' | 'light' | 'slate' | 'dark' | 'gradient' | 'brand' | 'amber';
+  imagePosition?: 'left' | 'right' | 'top' | 'background' | 'none';
+  enabled: boolean;
+  displayOrder: number;
+  customData?: {
+    principalName?: string;
+    principalQualification?: string;
+    principalPhoto?: string;
+    quote?: string;
+    highlights?: string[];
+    checklist?: string[];
+    stats?: any[];
+    videoUrl?: string;
+    mapEmbed?: string;
+    yearsOfExcellence?: string;
+    activeStudents?: string;
+    placementPercent?: string;
+    facultyCount?: string;
+    labsCount?: string;
+    googleMapEmbed?: string;
+    address?: string;
+    phone?: string;
+    email?: string;
+    [key: string]: any;
+  };
+  updatedAt?: string;
 }
 
 export interface FooterConfig {

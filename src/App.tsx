@@ -21,6 +21,8 @@ import { DynamicPageView } from './views/public/DynamicPageView';
 import { AdminLoginView } from './views/admin/AdminLoginView';
 import { AdminLayout } from './views/admin/AdminLayout';
 import { AdminDashboardOverview } from './views/admin/AdminDashboardOverview';
+import { AdminTickerManager } from './views/admin/AdminTickerManager';
+import { AdminHomeManager } from './views/admin/AdminHomeManager';
 import { AdminSliderManager } from './views/admin/AdminSliderManager';
 import { AdminMenuManager } from './views/admin/AdminMenuManager';
 import { AdminPageManager } from './views/admin/AdminPageManager';
@@ -86,6 +88,10 @@ const AppContent: React.FC = () => {
       switch (adminTab) {
         case 'dashboard':
           return <AdminDashboardOverview onSelectTab={setAdminTab} />;
+        case 'ticker':
+          return <AdminTickerManager />;
+        case 'home_layout':
+          return <AdminHomeManager />;
         case 'sliders':
           return <AdminSliderManager />;
         case 'menus':

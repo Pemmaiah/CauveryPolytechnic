@@ -10,6 +10,7 @@ import {
   AicteItem, 
   TickerItem, 
   WhyUsItem, 
+  HomeSection,
   FooterConfig, 
   WebsiteSettings 
 } from '../types';
@@ -992,3 +993,132 @@ export const initialSettings: WebsiteSettings = {
   },
   tickerSpeed: 30
 };
+
+export const initialHomeSections: HomeSection[] = [
+  {
+    id: 'hero_slider',
+    sectionType: 'hero_slider',
+    title: 'Hero Sliders',
+    subtitle: 'Cinematic Visual Hero Carousel',
+    badge: 'Hero Section',
+    enabled: true,
+    displayOrder: 1,
+    backgroundStyle: 'dark'
+  },
+  {
+    id: 'principal_welcome',
+    sectionType: 'principal_welcome',
+    title: "Principal's Welcome Desk",
+    subtitle: 'Nurturing Technical Excellence in Kodagu',
+    badge: "Principal's Message",
+    content: 'Welcome to Cauvery Polytechnic, Gonikoppal. Our institution is dedicated to imparting quality technical education that bridges the gap between academic theory and modern industrial engineering practices. With experienced faculty, cutting-edge labs, and vibrant campus life, we guide every student toward career success.',
+    imageUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80',
+    buttonText: "Read Full Principal's Desk",
+    buttonUrl: '/pages/principals-desk',
+    enabled: true,
+    displayOrder: 2,
+    backgroundStyle: 'white',
+    customData: {
+      principalName: 'Prof. K. B. Pemmaiah',
+      principalQualification: 'M.Tech, MISTE (Principal)',
+      quote: '"Empowering youth with tactile engineering knowledge, ethical values, and boundless career horizons."',
+      highlights: [
+        'AICTE Approved Diploma Programs',
+        'Affiliated to DTE Karnataka (Code: 494)',
+        'Pre-Placement Soft Skills & Interviews',
+        'SSP & NSP Scholarships Facilitated'
+      ]
+    }
+  },
+  {
+    id: 'why_us',
+    sectionType: 'why_us',
+    title: 'Why Choose Cauvery Polytechnic?',
+    subtitle: 'Combining academic rigor, practical industry skills, modern laboratories, and dedicated placement support in the peaceful green heart of South Kodagu.',
+    badge: 'Institution Strengths',
+    enabled: true,
+    displayOrder: 3,
+    backgroundStyle: 'light'
+  },
+  {
+    id: 'programmes',
+    sectionType: 'programmes',
+    title: 'Explore Engineering Programmes',
+    subtitle: 'AICTE Approved 3-Year Diploma Courses designed with hands-on practical skills and industry curriculum for high-growth tech careers.',
+    badge: 'Academic Offerings',
+    enabled: true,
+    displayOrder: 4,
+    backgroundStyle: 'white'
+  },
+  {
+    id: 'admission_cta',
+    sectionType: 'admission_cta',
+    title: 'Begin Your Journey as an Engineering Professional',
+    subtitle: 'Direct spot admission and online seat reservation available for SSLC and ITI passouts. Merit concessions & hostel facility available.',
+    badge: 'Admissions 2026-27 Open',
+    content: 'Join top diploma courses with hands-on workshops, state scholarships, and 100% placement mentorship.',
+    imageUrl: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80',
+    buttonText: 'Apply Online Now',
+    buttonUrl: '/admission',
+    secondaryButtonText: 'Fee Structure',
+    secondaryButtonUrl: '/pages/fee-structure',
+    enabled: true,
+    displayOrder: 5,
+    backgroundStyle: 'gradient'
+  },
+  {
+    id: 'events',
+    sectionType: 'events',
+    title: 'Campus Events & Workshops',
+    subtitle: 'Stay updated with upcoming technical symposiums, sports meets, cultural fests, and expert guest lecture series.',
+    badge: 'What\'s Happening',
+    enabled: true,
+    displayOrder: 6,
+    backgroundStyle: 'light'
+  },
+  {
+    id: 'news',
+    sectionType: 'news',
+    title: 'Latest News & Announcements',
+    subtitle: 'Official circulars, academic notifications, examination timetables, and campus achievement press releases.',
+    badge: 'Campus Bulletin',
+    enabled: true,
+    displayOrder: 7,
+    backgroundStyle: 'white'
+  },
+  {
+    id: 'facilities',
+    sectionType: 'facilities',
+    title: 'Campus Facilities & Infrastructure',
+    subtitle: 'Explore our modern digital classrooms, high-tech engineering laboratories, central library, and green sports campus.',
+    badge: 'World-Class Infrastructure',
+    enabled: true,
+    displayOrder: 8,
+    backgroundStyle: 'light'
+  },
+  {
+    id: 'gallery',
+    sectionType: 'gallery',
+    title: 'Campus Life & Visual Tour',
+    subtitle: 'Glimpses of active student life, annual sports day, state-level competitions, robotics labs, and graduation ceremonies.',
+    badge: 'Photo Gallery',
+    enabled: true,
+    displayOrder: 9,
+    backgroundStyle: 'white'
+  },
+  {
+    id: 'contact_map',
+    sectionType: 'contact_map',
+    title: 'Visit Cauvery Polytechnic Campus',
+    subtitle: 'Conveniently situated in Gonikoppal, South Kodagu, accessible via regular bus connectivity from Mysuru, Madikeri, Virajpet, and Kerala borders.',
+    badge: 'Campus Location',
+    buttonText: 'Send Enquiry',
+    buttonUrl: '/contact',
+    secondaryButtonText: 'Admissions Desk',
+    secondaryButtonUrl: '/admission',
+    enabled: true,
+    displayOrder: 10,
+    backgroundStyle: 'white'
+  }
+];
+

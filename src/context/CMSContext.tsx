@@ -13,6 +13,7 @@ import {
   ContactEnquiry, 
   TickerItem, 
   WhyUsItem, 
+  HomeSection,
   FooterConfig, 
   WebsiteSettings 
 } from '../types';
@@ -28,6 +29,7 @@ import {
   initialWhyUs, 
   initialAicte, 
   initialTicker, 
+  initialHomeSections,
   initialFooter, 
   initialSettings 
 } from '../lib/initialData';
@@ -65,9 +67,18 @@ interface CMSContextType {
   enquiries: ContactEnquiry[];
   contactEnquiries: ContactEnquiry[];
   ticker: TickerItem[];
+  homeSections: HomeSection[];
   footer: FooterConfig;
   settings: WebsiteSettings;
   loading: boolean;
+
+  // Home Sections
+  saveHomeSection: (section: Partial<HomeSection>) => Promise<string>;
+  addHomeSection: (section: Omit<HomeSection, 'id'>) => Promise<string>;
+  updateHomeSection: (id: string, section: Partial<HomeSection>) => Promise<void>;
+  deleteHomeSection: (id: string) => Promise<void>;
+  toggleHomeSection: (id: string, enabled: boolean) => Promise<void>;
+  reorderHomeSections: (sections: HomeSection[]) => Promise<void>;
 
   // Sliders
   saveSlider: (slide: Partial<SliderItem>) => Promise<void>;
@@ -176,6 +187,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [admissions, setAdmissions] = useState<AdmissionApplication[]>([]);
   const [contactEnquiries, setContactEnquiries] = useState<ContactEnquiry[]>([]);
   const [ticker, setTicker] = useState<TickerItem[]>(initialTicker);
+  const [homeSections, setHomeSections] = useState<HomeSection[]>(initialHomeSections);
   const [footer, setFooter] = useState<FooterConfig>(initialFooter);
   const [settings, setSettings] = useState<WebsiteSettings>(initialSettings);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
@@ -210,6 +222,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const unsubAdmissions = subscribeCollection<AdmissionApplication>('admissions', 'admissions', [], setAdmissions, 'createdAt');
     const unsubContact = subscribeCollection<ContactEnquiry>('contact', 'contact', [], setContactEnquiries, 'createdAt');
     const unsubTicker = subscribeCollection<TickerItem>('ticker', 'ticker', initialTicker, setTicker, 'order');
+    const unsubHomeSections = subscribeCollection<HomeSection>('homeSections', 'homeSections', initialHomeSections, setHomeSections, 'displayOrder');
 
     const unsubFooter = subscribeDoc<FooterConfig>('settings', 'footer', 'footer', initialFooter, setFooter);
     const unsubSettings = subscribeDoc<WebsiteSettings>('settings', 'general', 'settings', initialSettings, setSettings);
@@ -228,6 +241,7 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       unsubAdmissions();
       unsubContact();
       unsubTicker();
+      unsubHomeSections();
       unsubFooter();
       unsubSettings();
     };
@@ -645,6 +659,73 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     showToast('Ticker Item Deleted', 'Announcement removed.');
   };
 
+  // Home Sections Management
+  const saveHomeSection = async (section: Partial<HomeSection>) => {
+    const id = section.id || (section.sectionType === 'custom_block' ? `custom_${Date.now()}` : (section.sectionType || Date.now().toString()));
+    const now = new Date().toISOString();
+    const updatedSection = {
+      ...section,
+      id,
+      updatedAt: now
+    } as HomeSection;
+
+    setHomeSections((prev) => {
+      const idx = prev.findIndex((s) => s.id === id);
+      if (idx >= 0) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], ...updatedSection };
+        return next;
+      }
+      return [...prev, updatedSection];
+    });
+
+    await saveDocument('homeSections', updatedSection, id);
+    showToast('Section Saved', `Home section "${updatedSection.title}" updated.`);
+    return id;
+  };
+
+  const addHomeSection = async (section: Omit<HomeSection, 'id'>) => {
+    const id = `custom_${Date.now()}`;
+    const nextOrder = homeSections.length > 0 ? Math.max(...homeSections.map((s) => s.displayOrder || 0)) + 1 : 1;
+    await saveHomeSection({
+      ...section,
+      id,
+      displayOrder: section.displayOrder || nextOrder
+    });
+    return id;
+  };
+
+  const updateHomeSection = async (id: string, section: Partial<HomeSection>) => {
+    await saveHomeSection({ ...section, id });
+  };
+
+  const deleteHomeSection = async (id: string) => {
+    setHomeSections((prev) => prev.filter((s) => s.id !== id));
+    await deleteDocument('homeSections', id);
+    showToast('Section Removed', 'Home page section was removed.');
+  };
+
+  const toggleHomeSection = async (id: string, enabled: boolean) => {
+    const target = homeSections.find((s) => s.id === id);
+    if (target) {
+      await saveHomeSection({ ...target, enabled });
+      showToast(
+        enabled ? 'Section Enabled' : 'Section Disabled', 
+        `"${target.title}" is now ${enabled ? 'visible' : 'hidden'} on the home page.`
+      );
+    }
+  };
+
+  const reorderHomeSections = async (items: HomeSection[]) => {
+    const updated = items.map((item, index) => ({
+      ...item,
+      displayOrder: index + 1
+    }));
+    setHomeSections(updated);
+    await updateDocumentOrder('homeSections', updated, 'displayOrder');
+    showToast('Layout Updated', 'Home page section order updated successfully.');
+  };
+
   const updateFooter = async (data: Partial<FooterConfig>) => {
     const merged = { ...footer, ...data };
     setFooter(merged);
@@ -752,9 +833,16 @@ export const CMSProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         enquiries: contactEnquiries,
         contactEnquiries,
         ticker,
+        homeSections,
         footer,
         settings,
         loading,
+        saveHomeSection,
+        addHomeSection,
+        updateHomeSection,
+        deleteHomeSection,
+        toggleHomeSection,
+        reorderHomeSections,
         saveSlider,
         addSlider,
         updateSlider,
