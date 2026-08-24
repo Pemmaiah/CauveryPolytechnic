@@ -33,15 +33,29 @@ export const PublicFooter: React.FC<PublicFooterProps> = ({ onNavigate }) => {
               onClick={() => onNavigate('/')}
               className="flex items-center gap-3 cursor-pointer group"
             >
-              <div className="w-12 h-12 rounded-xl bg-blue-900 border border-amber-500 flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform">
-                <GraduationCap className="w-7 h-7 text-amber-400" />
-              </div>
-              <div>
-                <h3 className="text-base font-extrabold text-white uppercase font-serif leading-tight">
-                  {settings.collegeName || 'Cauvery Polytechnic'}
-                </h3>
-                <p className="text-xs font-semibold text-amber-400 uppercase">Gonikoppal, Kodagu</p>
-              </div>
+              {/* Emblem / Logo */}
+              {settings.logoDisplayMode !== 'text_only' && (
+                <div className="w-12 h-12 rounded-xl bg-blue-900 border border-amber-500 flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform overflow-hidden">
+                  {settings.logo ? (
+                    <img 
+                      src={settings.logo} 
+                      alt={settings.collegeName || 'College Logo'} 
+                      className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <GraduationCap className="w-7 h-7 text-amber-400" />
+                  )}
+                </div>
+              )}
+              {settings.logoDisplayMode !== 'logo_only' && (
+                <div>
+                  <h3 className="text-base font-extrabold text-white uppercase font-serif leading-tight">
+                    {settings.collegeName || 'Cauvery Polytechnic'}
+                  </h3>
+                  <p className="text-xs font-semibold text-amber-400 uppercase">Gonikoppal, Kodagu</p>
+                </div>
+              )}
             </div>
 
             <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">

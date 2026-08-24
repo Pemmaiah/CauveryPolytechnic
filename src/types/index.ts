@@ -145,14 +145,17 @@ export interface AicteItem {
   academicYear: string;
   documentUrl?: string;
   fileUrl?: string;
+  pdfData?: string; // Stored PDF Base64 / Data URL
   fileName?: string;
   fileSize?: string;
+  fileType?: string;
   referenceNumber?: string;
   issueDate?: string;
   description?: string;
   active?: boolean;
   displayOrder?: number;
   date?: string;
+  uploadDate?: string;
   uploadedAt?: string;
 }
 
@@ -317,6 +320,10 @@ export interface WebsiteSettings {
   aicteCode?: string;
   dteCode?: string;
   logo?: string;
+  logoDisplayMode?: 'both' | 'logo_only' | 'text_only';
+  logoHeight?: number; // e.g. 48 - 80px
+  logoShape?: 'rounded' | 'square' | 'circle';
+  trustLogo?: string;
   favicon?: string;
   affiliation?: string;
   dsaApproved?: boolean;

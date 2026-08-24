@@ -86,31 +86,58 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate }) => {
 
       {/* Main Logo & Identity Row */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
-        {/* Brand Logo & Name */}
-        <div 
-          onClick={() => onNavigate('/')}
-          className="flex items-center gap-3.5 cursor-pointer group select-none"
-        >
-          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-blue-900 via-blue-950 to-slate-900 border-2 border-amber-500 shadow-md flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform">
-            <GraduationCap className="w-7 h-7 sm:w-8 sm:h-8 text-amber-400" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-base sm:text-xl font-extrabold tracking-tight text-blue-950 uppercase leading-tight font-serif">
-                {settings.collegeName || 'Cauvery Polytechnic'}
-              </h1>
-              <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded border border-amber-300 hidden sm:inline">
-                ESTD. KODAGU
-              </span>
+        {/* Brand Logo & Name with 3 Display Modes */}
+        {(() => {
+          const displayMode = settings.logoDisplayMode || 'both';
+          const logoShapeClass = 
+            settings.logoShape === 'circle' ? 'rounded-full' :
+            settings.logoShape === 'square' ? 'rounded-none' : 'rounded-2xl';
+
+          return (
+            <div 
+              onClick={() => onNavigate('/')}
+              className="flex items-center gap-3.5 cursor-pointer group select-none"
+            >
+              {/* Emblem / Logo (Rendered if 'both' or 'logo_only') */}
+              {displayMode !== 'text_only' && (
+                <div 
+                  className={`w-12 h-12 sm:w-14 sm:h-14 ${logoShapeClass} bg-gradient-to-br from-blue-900 via-blue-950 to-slate-900 border-2 border-amber-500 shadow-md flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform overflow-hidden`}
+                >
+                  {settings.logo ? (
+                    <img 
+                      src={settings.logo} 
+                      alt={settings.collegeName || 'College Logo'} 
+                      className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <GraduationCap className="w-7 h-7 sm:w-8 sm:h-8 text-amber-400" />
+                  )}
+                </div>
+              )}
+
+              {/* College Typography (Rendered if 'both' or 'text_only') */}
+              {displayMode !== 'logo_only' && (
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-base sm:text-xl font-extrabold tracking-tight text-blue-950 uppercase leading-tight font-serif">
+                      {settings.collegeName || 'Cauvery Polytechnic'}
+                    </h1>
+                    <span className="bg-amber-100 text-amber-800 text-[10px] font-bold px-1.5 py-0.5 rounded border border-amber-300 hidden sm:inline">
+                      ESTD. KODAGU
+                    </span>
+                  </div>
+                  <p className="text-xs font-semibold text-amber-700 tracking-wide uppercase">
+                    Gonikoppal, South Kodagu, Karnataka
+                  </p>
+                  <p className="text-[11px] text-slate-500 hidden md:block leading-tight mt-0.5">
+                    {settings.affiliation || 'Approved by AICTE, New Delhi & Affiliated to DTE Bengaluru'}
+                  </p>
+                </div>
+              )}
             </div>
-            <p className="text-xs font-semibold text-amber-700 tracking-wide uppercase">
-              Gonikoppal, South Kodagu, Karnataka
-            </p>
-            <p className="text-[11px] text-slate-500 hidden md:block leading-tight mt-0.5">
-              {settings.affiliation || 'Approved by AICTE, New Delhi & Affiliated to DTE Bengaluru'}
-            </p>
-          </div>
-        </div>
+          );
+        })()}
 
         {/* CTA & Mobile Toggle */}
         <div className="flex items-center gap-3">

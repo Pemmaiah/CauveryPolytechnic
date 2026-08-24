@@ -98,8 +98,12 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           </button>
 
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-blue-900 border border-amber-500 flex items-center justify-center text-amber-400">
-              <GraduationCap className="w-5 h-5" />
+            <div className="w-8 h-8 rounded-lg bg-blue-900 border border-amber-500 flex items-center justify-center text-amber-400 overflow-hidden shrink-0">
+              {settings.logo ? (
+                <img src={settings.logo} alt="Logo" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+              ) : (
+                <GraduationCap className="w-5 h-5" />
+              )}
             </div>
             <div className="hidden sm:block">
               <span className="font-extrabold text-white text-xs tracking-tight uppercase">
